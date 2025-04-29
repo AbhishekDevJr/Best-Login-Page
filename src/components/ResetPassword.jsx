@@ -1,33 +1,61 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TextField, Button, Box, Typography } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ResetPassword() {
     const { control, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+    const user = localStorage.getItem('users') ? JSON.parse(localStorage.getItem('users')) : []
 
     const onSubmit = (data) => {
         // Custom Logic
-        navigate('/show-password')
+        const currUser = user.find((item) => item.username === data.username);
+        if (currUser) {
+            localStorage.setItem('showUser', JSON.stringify(currUser));
+            setTimeout(() => navigate('/show-password'), 1000);
+        }
+        else {
+            toast.error(`No user found with username ${data.username}`, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
+        }
     };
 
     return (
         <div className='container-reset-password min-w-[100vw] min-h-[100vh] flex justify-center items-center bg-[#EBEFF3]'>
+            <ToastContainer
+                position="top-center"
+                autoClose={3000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                // pauseOnHover
+                theme="dark"
+            // transition: Bounce
+            />
             <Box sx={{ width: "480px" }} style={{ outline: "1px solid #fff", padding: '20px', backgroundColor: '#fff', borderRadius: "5px" }}>
                 <Typography variant="h4" gutterBottom>
                     Reset Password
                 </Typography>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Controller
-                        name="Username"
+                        name="username"
                         control={control}
                         rules={{
                             required: "Your Username is required",
-                            pattern: {
-                                value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                                message: "Enter a valid Username"
-                            }
                         }}
                         render={({ field }) =>
                             <TextField
@@ -36,8 +64,8 @@ function ResetPassword() {
                                 type="text"
                                 fullWidth
                                 margin="normal"
-                                error={!!errors.email}
-                                helperText={errors.email ? errors.email.message : ""}
+                                error={!!errors.username}
+                                helperText={errors.username ? errors.username.message : ""}
                             />}
                     />
                     <div className='flex flex-col'>

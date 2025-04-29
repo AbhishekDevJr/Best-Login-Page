@@ -13,14 +13,24 @@ function Login() {
   const onSubmit = (data, event) => {
     // Custom Logic
     const action = event.nativeEvent.submitter.value;
-    console.log('data', data, action);
     const loginUser = users.find((item) => item.username === data.username);
 
     if (action === 'signin') {
       if (loginUser) {
         if (loginUser.password === data.password) {
-          //Handle Successfull Login
           navigate('/dashboard');
+        }
+        else {
+          toast.error(`Failed to login. Please check your username & password.`, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
         }
       } else {
         //
@@ -51,7 +61,8 @@ function Login() {
       else {
         const currentUser = {
           username: data.username,
-          password: data.password
+          password: `${data.password}real`,
+          realPassword: data.password
         }
 
         const updateUserList = [...users, currentUser];
@@ -96,10 +107,7 @@ function Login() {
             control={control}
             rules={{
               required: "Username is required",
-              // pattern: {
-              //   value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-              //   message: "Enter a valid Username"
-              // }
+
             }}
             render={({ field }) =>
               <TextField

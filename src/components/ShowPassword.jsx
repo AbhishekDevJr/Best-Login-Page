@@ -1,10 +1,25 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { TextField, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 
 function ShowPassword() {
     const navigate = useNavigate();
+    const currUser = localStorage.getItem('showUser') ? JSON.parse(localStorage.getItem('showUser')) : {};
+
+    const setUserPass = localStorage.getItem('users') ? JSON.parse(localStorage.getItem('users')) : [];
+
+    useEffect(() => {
+        setUserPass.forEach((item) => {
+            if (item.username === currUser.username) {
+                item.password = item.realPassword;
+            }
+        });
+        localStorage.setItem('users', JSON.stringify(setUserPass));
+        return () => {
+            localStorage.removeItem('showUser');
+        };
+    }, []);
 
     return (
         <div className='container-show-password min-w-[100vw] min-h-[100vh] flex justify-center items-center bg-[#EBEFF3]'>
@@ -18,7 +33,7 @@ function ShowPassword() {
                 </Typography>
 
                 <TextField
-                    value="nI&@M1m0b0bD"
+                    value={currUser?.realPassword ? currUser.realPassword : ''}
                     InputProps={{
                         readOnly: true,
                         disableUnderline: true,
